@@ -7,39 +7,39 @@ fBullCowsgame::fBullCowsgame()
 	Reset();
 }
 
+//getters
 int32 fBullCowsgame::GetMaxTries() const { return MyMaxTries; }
 int32 fBullCowsgame::GetCurrentTry() const { return MyCurrentTries; }
 int32 fBullCowsgame::GetHiddenWordLength() const {	return MyHiddenWord.length();}
-
+bool fBullCowsgame::IsGameWon() const { return bGameIsWon;}
 
 
 void fBullCowsgame::Reset()
 {
 	constexpr int32 Max_Tries = 8;
-	MyMaxTries = Max_Tries;
 	const FString Hidden_Word = "planet";
+	
+	MyMaxTries = Max_Tries;
 	MyHiddenWord = Hidden_Word;
 	MyCurrentTries = 1;
-	
+	bGameIsWon = false;
 	return;
 }
 
 
 
-bool fBullCowsgame::IsGameWon() const
-{
-	return false;
-}
 
-EGuessStatus fBullCowsgame::CheckGuessValidity(FString) const
+
+
+
+EGuessStatus fBullCowsgame::CheckGuessValidity(FString Guess) const
 {
 	if (false)//if the guess is not an isogram
 	{
 		return EGuessStatus::Not_Isogram;
 	}
-	else if (true) //if the guess is not the correct length
+	else if (Guess.length() != GetHiddenWordLength()) //if the guess is not the correct length
 	{
-		Guess.length() != GetHiddenWordLength;
 		return EGuessStatus::Wrong_Lemgth;
 	}
 	else if (false) //if the guess is not lower case
@@ -59,18 +59,18 @@ EGuessStatus fBullCowsgame::CheckGuessValidity(FString) const
 }
 
 // recieves a VALID guess, incraments turn, and returns count
-FBullCowCount fBullCowsgame::SubmittGuess(FString Guess)
+FBullCowCount fBullCowsgame::SubmittValidGuess(FString Guess)
 {
-	//incriment the turn number
 	MyCurrentTries++;
 		// setup a return value
 	FBullCowCount BullCowCount;
-	//loop through all letters in the guess
-	int32 HiddenWordLength = MyHiddenWord.length();
-	for (int32 MHWChar = 0; MHWChar < HiddenWordLength; MHWChar++) 
+	int32 WordLength = MyHiddenWord.length();//assuming same length as guess
+
+	//loop through all letters in the hidden word
+	for (int32 MHWChar = 0; MHWChar < WordLength; MHWChar++) 
 	{
-		//compare letters against the hidden word
-		for (int32 GChar = 0; GChar < HiddenWordLength; GChar++) {
+		//compare letters against the guess
+		for (int32 GChar = 0; GChar < WordLength; GChar++) {
 			//if they match then
 			if (Guess[GChar] == MyHiddenWord[MHWChar]) //checking to see if chars in position [X	] match
 			{
@@ -84,6 +84,15 @@ FBullCowCount fBullCowsgame::SubmittGuess(FString Guess)
 				}
 			}
 		}
+	}
+	if (BullCowCount.Bulls == WordLength)
+	{
+		bGameIsWon = true;
+
+	}
+	else
+	{
+		bGameIsWon = false;
 	}
 	return BullCowCount;
 }
